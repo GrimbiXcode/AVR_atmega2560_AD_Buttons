@@ -47,28 +47,52 @@
 void initIO(void)
 {
   LEDDDR = HEARTBEAT_LED; //identisch mit: DDRD = 0b00000010
+  DDRC = 0xff;    // set LED-Port to output
+  PORTA = BTNMASK;  // enable pullups on buttons
 }
+/*===================================================================
+* end of function
+===================================================================*/
+
 
 /*===================================================================
-* Inititalisation of Ports
+* Inititalisation of ADConverter
 * Input: -
 * Return: -
 ===================================================================*/
 void init_adc(void)
 {
-  ADMUX = HEARTBEAT_LED; //identisch mit: DDRD = 0b00000010
+  ADMUX = 0b01000000; // VCC ref , Left adj ,Single ended ADC0
+  ADCSRA = 0b10000111; // enable Presc:125kHz
 }
+/*===================================================================
+* end of function
+===================================================================*/
+
 
 /********************************************************************
 * Routines
 *
 ********************************************************************/
+
 /*===================================================================
-* Function-Description
+* Reading of ADConverter
 * Input: -
 * Return: -
 ===================================================================*/
-
+unsigned int read_adc(void)
+{
+  unsigned int adValue = 0;
+  ADCSRA |= 0b01000000; // start convertion
+  while(ADCSRA & 0b01000000)
+  {
+  }
+  adValue = ADC;
+  return adValue;
+}
+/*===================================================================
+* end of function
+===================================================================*/
 
 /********************************************************************
 * Main-code
@@ -76,28 +100,64 @@ void init_adc(void)
 ********************************************************************/
 int main(void)
 {
-  char buttons;
+  unsigned int adValue = 0;
 
   static FILE lcd_fd = FDEV_SETUP_STREAM(lcd_putchar, NULL, _FDEV_SETUP_WRITE);
   stdout = &lcd_fd; // set stdout to lcd stream initalized above
 
+  initIO();
+  init_adc();
   init_lcd();
-
-  DDRC = 0xff;    // set LED-Port to output
-  PORTA = BTNMASK;  // enable pullups on buttons
   
   while (1)
   { 
-    buttons = (~PINA & BTNMASK) >> 4;   // read buttons ans shift to LSB
-    printf("* LCD Test *\rButtons = %d\n",buttons); // print both lines of lcd display
-    PORTC=buttons;
-  _delay_ms(100);
+    adValue = read_adc();
+    printf("RAW = %u\rCalc. = %umV\n",adValue,adValue*2560L/1023L); // print both lines of lcd display
+    _delay_ms(100); // waiting for display
   }
 }
 
 /********************************************************************
 * End of code
 ********************************************************************/
+
+
+
+
+//  char buttons;
+
+//    PORTC=buttons;
+//    buttons = (~PINA & BTNMASK) >> 4;   // read buttons ans shift to LSB
+
+
+
+
+
+
+/*===================================================================
+* Function-Description
+* Input: -
+* Return: -
+===================================================================*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
