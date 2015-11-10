@@ -1,5 +1,6 @@
 # Object files
 *.o
+!lcd_keypad_m2560.o
 *.ko
 *.obj
 *.elf

@@ -94,6 +94,24 @@ unsigned int read_adc(void)
 * end of function
 ===================================================================*/
 
+/*===================================================================
+* Decoding ADC to Tastencode 0 to 5
+* Input: -
+* Return: -
+===================================================================*/
+unsigned char decode(unsigned int adValue)
+{
+  if(adValue >= 1000)  return 0;
+  if(adValue >= 700)  return 1;
+  if(adValue >= 450)  return 2;
+  if(adValue >= 300)   return 3;
+  if(adValue >= 100)   return 4;
+  else                  return 5;
+}
+/*===================================================================
+* end of function
+===================================================================*/
+
 /********************************************************************
 * Main-code
 *
@@ -112,7 +130,7 @@ int main(void)
   while (1)
   { 
     adValue = read_adc();
-    printf("RAW = %u\rCalc. = %umV\n",adValue,adValue*2560L/1023L); // print both lines of lcd display
+    printf("Code:%d RAW=%u\rCalc. = %umV\n",decode(adValue),adValue,(unsigned int)(adValue*2560L/1023L)); // print both lines of lcd display
     _delay_ms(100); // waiting for display
   }
 }
